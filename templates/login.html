@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Login - xOS</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="login-body">
+  <div class="login-overlay"></div>
+  
+  <div class="rain" id="rainContainer"></div>
+
+  <div class="card login-card">
+    <h2 style="margin-bottom:25px; font-size:2.2rem; color: var(--primary);">xOS <span style="color:white">Login</span></h2>
+    <form method="post">
+      <input type="text" name="username" placeholder="Nome utente" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <input type="submit" value="Accedi">
+    </form>
+  </div>
+
+  <script>
+    const container = document.getElementById('rainContainer');
+    // Creiamo 40 gocce "disegnate"
+    for (let i = 0; i < 40; i++) {
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      
+      // Posizione orizzontale casuale (anche oltre il bordo destro per l'inclinazione)
+      drop.style.left = Math.random() * 120 + 'vw'; 
+      
+      // Velocità lenta (tra 4 e 8 secondi)
+      const duration = Math.random() * 4 + 4;
+      drop.style.animationDuration = duration + 's';
+      
+      // Ritardo casuale per non farle partire tutte insieme
+      drop.style.animationDelay = Math.random() * 5 + 's';
+      
+      // Dimensioni leggermente diverse per dare profondità
+      const size = Math.random() * 8 + 6;
+      drop.style.width = size + 'px';
+      drop.style.height = size + 'px';
+      
+      container.appendChild(drop);
+    }
+  </script>
+
+  <div class="flash-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash" id="f-{{ loop.index }}">
+            <div class="flash-timer"></div>
+            <strong>Errore:</strong> {{ m }}
+          </div>
+          <script>setTimeout(() => document.getElementById('f-{{ loop.index }}')?.remove(), 5000);</script>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/static/style.css">
+  <title>Editor - {{ filename }}</title>
+</head>
+<body>
+  <header>
+    <div>Editing: {{ filename }}</div>
+    <a href="/?path={{ rel }}" class="btn" style="background:#444;">Chiudi</a>
+  </header>
+  <div class="container">
+    <div class="card">
+      <form method="post">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="margin:0;">File: {{ filename }}</h3>
+          {% if not is_image %}
+            <input type="submit" value="💾 SALVA FILE" style="background:#28a745; width:auto; padding:10px 25px;">
+          {% endif %}
+        </div>
+
+        {% if is_image %}
+          <div style="text-align:center; padding:20px;">
+            <img src="/media/{{ (rel + '/' + filename).lstrip('/') }}" style="max-width:100%; border-radius:15px; border:2px solid #333;">
+          </div>
+        {% else %}
+          <textarea name="content" spellcheck="false">{{ content }}</textarea>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="flash-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash"><strong>Info:</strong> {{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+</body>
+</html>

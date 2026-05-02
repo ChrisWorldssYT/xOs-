@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/static/style.css">
+  <title>xOs - CMD</title>
+</head>
+<body class="login-body">
+  <div class="rain" id="rain"></div>
+  <div class="container" style="position:relative; z-index:10; max-width: 900px;">
+    <div class="card" style="background:rgba(0,0,0,0.92); border: 1px solid var(--primary); box-shadow: 0 0 20px var(--primary);">
+      <h3 style="color:var(--primary); margin:0 0 15px 0;">💻 Terminale di Sistema</h3>
+      
+      <pre style="background:#000; color:#00ff00; padding:15px; height:350px; overflow:auto; border:1px solid #333; font-family:'Consolas', monospace; font-size:0.9rem;">{{ output if output else 'Sessione avviata...' }}</pre>
+      
+      <div style="margin-top:15px; background:#111; padding:10px; border-radius:5px; border:1px solid #222;">
+        <div style="color:#888; font-size:0.75rem; margin-bottom:5px;">DIRECTORY ATTUALE:</div>
+        <div style="color:var(--primary); font-family:monospace; margin-bottom:10px; word-break: break-all;">{{ cwd }}></div>
+        
+        <form method="post" style="display:flex; gap:10px;">
+          <input type="text" name="command" placeholder="Digita un comando (es. mkdir cartella, ls, cd ..)" 
+                 style="background:transparent; border:none; border-bottom:2px solid var(--primary); color:#fff; margin:0; flex-grow:1; outline:none;" autofocus>
+          <input type="submit" value="ESEGUI" style="width:auto; padding:5px 20px;">
+        </form>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:15px;">
+        <a href="/" class="btn" style="background:#444; flex-grow:1; text-align:center;">🏠 Home</a>
+        <form method="post" style="flex-grow:1;">
+            <input type="hidden" name="command" value="ls">
+            <input type="submit" value="Lista File" style="width:100%; background:#222;">
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const r = document.getElementById('rain');
+    for(let i=0; i<30; i++) {
+      const d = document.createElement('div');
+      d.className = 'drop';
+      d.style.left = Math.random() * 100 + 'vw';
+      d.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      r.appendChild(d);
+    }
+  </script>
+</body>
+</html>

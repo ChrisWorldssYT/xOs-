@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/static/style.css">
+  <title>xOs Centrale</title>
+</head>
+<body>
+  <header>
+    <div><strong>xOs<span style="color:var(--primary)">Centrale</span></strong></div>
+    <div>
+      <a href="/cmd" style="color:#00ff00; margin-right:20px; text-decoration:none; font-weight:800;">⚡ CMD</a>
+      <a href="/settings" style="color:var(--primary); margin-right:20px; text-decoration:none; font-weight:800;">⚙️ Impostazioni</a>
+      <a href="/logout" style="color:white; text-decoration:none; font-weight:800;">Esci</a>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="card stats-grid">
+        <div class="stat-item">
+            <div class="stat-label">CPU <span>{{ cpu }}%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: {{ cpu }}%"></div></div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">RAM <span>{{ ram.percent }}%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: {{ ram.percent }}%"></div></div>
+        </div>
+        {% if disk %}
+        <div class="stat-item">
+            <div class="stat-label">DISCO <span>{{ (disk.used / (1024**3))|round(1) }}GB</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: {{ disk.percent }}%"></div></div>
+        </div>
+        {% endif %}
+    </div>
+
+    <form action="/download_zip" method="post">
+      <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0;">📁 /{{ rel }}</h3>
+        <div>
+          <input type="submit" id="zipBtn" value="📦 Scarica ZIP" style="background:#28a745; width:auto;">
+          {% if parent_path is not none or rel != "" %}
+            <a href="?path={{ parent_path }}" class="btn" style="background:#444;">⬅ Indietro</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <ul class="entries">
+          {% for e in entries %}
+            <li>
+              <div style="display:flex; align-items:center;">
+                <input type="checkbox" name="items" value="{{ e.name }}" class="file-check" style="margin-right:15px;">
+                <strong>{{ "📂" if e.is_dir else "📄" }} {{ e.name }}</strong>
+              </div>
+              <div>
+                {% if e.is_dir %}<a href="?path={{ (rel + '/' + e.name).lstrip('/') }}" class="btn">Apri</a>
+                {% else %}
+                  <a href="/view?path={{rel}}&file={{e.name}}" style="margin-right:15px; color:var(--primary); text-decoration:none; font-weight:800;">Modifica</a>
+                  <a href="/download?path={{rel}}&file={{e.name}}" style="color:white; text-decoration:none;">Download</a>
+                {% endif %}
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
