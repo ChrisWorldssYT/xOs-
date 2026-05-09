@@ -25,21 +25,27 @@
             <div class="stat-label">RAM <span>{{ ram.percent }}%</span></div>
             <div class="progress-bar"><div class="progress-fill" style="width: {{ ram.percent }}%"></div></div>
         </div>
-        {% if disk %}
         <div class="stat-item">
-            <div class="stat-label">DISCO <span>{{ (disk.used / (1024**3))|round(1) }}GB</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width: {{ disk.percent }}%"></div></div>
+            <div class="stat-label">DISCO <span>{{ disk.percent if disk else 0 }}%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width: {{ disk.percent if disk else 0 }}%"></div></div>
         </div>
-        {% endif %}
     </div>
 
-    <form action="/download_zip" method="post">
+    <div class="card">
+      <h3 style="margin-bottom:15px;">⬆️ Carica File</h3>
+      <form action="/upload?path={{ rel }}" method="post" enctype="multipart/form-data" style="display:flex; gap:10px;">
+        <input type="file" name="file" style="flex-grow:1; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border:1px solid #333; color:white;">
+        <input type="submit" value="Carica" style="width:auto; padding:0 25px; background:var(--primary-dark);">
+      </form>
+    </div>
+
+    <form action="/download_zip?path={{ rel }}" method="post">
       <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
         <h3 style="margin:0;">📁 /{{ rel }}</h3>
         <div>
           <input type="submit" id="zipBtn" value="📦 Scarica ZIP" style="background:#28a745; width:auto;">
           {% if parent_path is not none or rel != "" %}
-            <a href="?path={{ parent_path }}" class="btn" style="background:#444;">⬅ Indietro</a>
+            <a href="?path={{ parent_path }}" class="btn" style="background:#444; width:auto; padding:10px 20px;">⬅ Indietro</a>
           {% endif %}
         </div>
       </div>
@@ -52,18 +58,78 @@
                 <input type="checkbox" name="items" value="{{ e.name }}" class="file-check" style="margin-right:15px;">
                 <strong>{{ "📂" if e.is_dir else "📄" }} {{ e.name }}</strong>
               </div>
-              <div>
-                {% if e.is_dir %}<a href="?path={{ (rel + '/' + e.name).lstrip('/') }}" class="btn">Apri</a>
-                {% else %}
-                  <a href="/view?path={{rel}}&file={{e.name}}" style="margin-right:15px; color:var(--primary); text-decoration:none; font-weight:800;">Modifica</a>
-                  <a href="/download?path={{rel}}&file={{e.name}}" style="color:white; text-decoration:none;">Download</a>
+              
+              <div class="dropdown">
+                {% if e.is_dir %}
+                  <a href="?path={{ (rel + '/' + e.name).lstrip('/') }}" class="btn" style="width:auto; padding:5px 15px; font-size: 0.8rem;">Apri</a>
                 {% endif %}
+                
+                <button type="button" class="dropbtn" onclick="toggleMenu('menu-{{ loop.index }}')">•••</button>
+                <div id="menu-{{ loop.index }}" class="dropdown-content">
+                  {% if not e.is_dir %}
+                    <a href="/view?path={{rel}}&file={{e.name}}">👁️ Visualizza</a>
+                    <a href="/download?path={{rel}}&file={{e.name}}">📥 Download</a>
+                  {% endif %}
+                  <a href="#" onclick="renamePrompt('{{ e.name }}', '{{ rel }}')">✏️ Rinomina</a>
+                  <a href="/delete?path={{rel}}&file={{e.name}}" 
+                     onclick="return confirm('Eliminare {{e.name}}?')" 
+                     style="color:#ff4d4d;">🗑️ Elimina</a>
+                </div>
               </div>
             </li>
+          {% else %}
+            <li style="justify-content:center; opacity:0.5;">Cartella vuota</li>
           {% endfor %}
         </ul>
       </div>
     </form>
   </div>
+
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, m in messages %}
+          <div class="flash {{ category }}">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <script>
+    function toggleMenu(id) {
+        document.querySelectorAll('.dropdown-content').forEach(menu => {
+            if(menu.id !== id) menu.classList.remove('show');
+        });
+        document.getElementById(id).classList.toggle('show');
+    }
+
+    function renamePrompt(oldName, relPath) {
+        let newName = prompt("Inserisci il nuovo nome per " + oldName, oldName);
+        if (newName && newName !== oldName) {
+            let form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/rename?path=' + relPath;
+            
+            let inputOld = document.createElement('input');
+            inputOld.name = 'old_name';
+            inputOld.value = oldName;
+            form.appendChild(inputOld);
+            
+            let inputNew = document.createElement('input');
+            inputNew.name = 'new_name';
+            inputNew.value = newName;
+            form.appendChild(inputNew);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+            document.querySelectorAll('.dropdown-content').forEach(menu => menu.classList.remove('show'));
+        }
+    }
+  </script>
 </body>
 </html>
