@@ -1,9 +1,13 @@
 # xOs
-a CasaOs Remake made in python in italy
+a CasaOs Remake made in python and Flask
 
 ## INFO
 
 The default account is **admin** and the password is **admin123** 
+
+## QUICK ADVISE
+
+The default password is **admin123** you need to change the password going on **Settings** and in the "Utenti" form you put in the first textbox **admin** then in the other you put your new password (you can add more users)
 
 ## INSTALL PROCEDURE
 
